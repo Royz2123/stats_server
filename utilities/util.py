@@ -41,6 +41,11 @@ def write(fd, buf):
     while buf:
         buf = buf[os.write(fd, buf):]
 
+
+def open_and_write(filename, content):
+    with open(filename, 'w') as f:
+        f.write(content)
+
 ## Reads from a file a certain size
 ## @param file descriptor (int) open file for reading from which we are
 ## reading
@@ -55,6 +60,37 @@ def read(fd, max_buffer):
         ret += buf
     return ret
 
+## function that recieves whatever the socket can recieve and updates
+## the recvd_data buffer
+## @param entry (@ref pollables.pollable.Pollable)
+def get_buf(entry):
+    try:
+        t = entry.socket.recv(constants.MAX_BUFFER)
+        if not t:
+            raise util.Disconnect(
+                'Disconnected while recieving content'
+            )
+        entry.recvd_data += t
+
+    except socket.error as e:
+        traceback.print_exc()
+        if e.errno not in (errno.EAGAIN, errno.EWOULDBLOCK):
+            raise
+        logging.debug("%s :\t Haven't finished writing yet" % entry)
+
+## function that sends whatever the socket has in data_to_send
+## @param entry (@ref pollables.pollable.Pollable)
+def send_buf(entry):
+    try:
+        while entry.data_to_send != "":
+            entry.data_to_send = entry.data_to_send[
+                entry.socket.send(entry.data_to_send):
+            ]
+    except socket.error as e:
+        if e.errno not in (errno.EAGAIN, errno.EWOULDBLOCK):
+            raise
+        logging.debug("%s :\t Haven't finished reading yet" % entry)
+
 ## Parse a header from a HTTP request or response
 ## @param line (string) unparsed header line
 ## @returns parsed_header (tuple) tuple of the header:
@@ -67,10 +103,8 @@ def parse_header(line):
     return line[:n].rstrip(), line[n + len(SEP):].lstrip()
 
 
-    
-def update_xml(entry):
-    pass
-    
+
+
 # Important Error classes
 
 ## Disconnect Error. called when a socket has disconnected ungraceully.
@@ -91,4 +125,3 @@ class InvalidArguments(RuntimeError):
     ## @param desc (optional) (string) string descrbing the invalid arguments
     def __init__(self, desc="Bad Arguments"):
         super(InvalidArguments, self).__init__(desc)
-

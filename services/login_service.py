@@ -43,35 +43,30 @@ class LoginService(base_service.BaseService):
     # @param entry (pollable) the entry that the service is assigned to
     # @returns (bool) if finished and ready to move on
     def before_response_status(self, entry):
-        users_file = entry.application_context["users_file"]
         req_name, req_pswd = (
             self._args["username"][0],
             self._args["password"][0]
         )
         fd = None
         try:
-            fd = os.open(users_file, os.O_RDONLY) 
+            fd = os.open(entry.application_context["users_file"], os.O_RDONLY)
             users = util.read(fd, constants.MAX_USERS_FILE_SIZE).split(
                 constants.USERS_SEPERATOR
             )
             parsed_users = {}
             for user in users[:-1]:
-                print user
-                name, pswd = user.split(constants.CREDENTIALS_SEPERATOR, 1)
+                name, pswd, greet = user.split(constants.CREDENTIALS_SEPERATOR, 2)
                 parsed_users[name] = pswd
-            
+
             if (
                 req_name not in parsed_users.keys()
                 or req_pswd != parsed_users[req_name]
             ):
                 raise RuntimeError("Invalid Credentials")
-                
-            util.update_xml(entry)    
+
             self._response_content = html_util.create_html_page(
-                "",
+                html_util.create_stats_page(greet),
                 header="Capitalead - Statistics",
-                refresh=0,
-                redirect_url="/statistics.html",
             )
             self._response_headers = {
                 "Content-Length": len(self._response_content)
@@ -82,5 +77,5 @@ class LoginService(base_service.BaseService):
         finally:
             if fd is not None:
                 os.close(fd)
-        
+
         return True

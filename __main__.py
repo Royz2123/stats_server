@@ -92,6 +92,7 @@ def main():
         "poll_timeout": args.poll_timeout,
         "users_file" : args.users_file,
         "stats_file" : constants.DEFAULT_STATS_FILE,
+        "Statistics" : {},
     }
     server = async_server.AsyncServer(application_context)
     server.run()

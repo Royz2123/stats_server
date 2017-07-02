@@ -37,7 +37,10 @@ def create_html_page(
 
     return (
         (
-            "<HTML><HEAD>%s%s%s<TITLE>%s</TITLE></HEAD>" +
+            "<HTML><HEAD>%s%s%s" +
+            "<script type='text/javascript' src='stats_xml_script.js'></script>" +
+            "<meta charset='utf-8' />" +
+            "<TITLE>%s</TITLE></HEAD>" +
             "<BODY>%s</BODY></HTML>"
         ) % (
             create_style_link(),
@@ -50,6 +53,28 @@ def create_html_page(
             content
         )
     )
+
+
+def create_stats_page(greet):
+    return """
+        <div class="content-space">
+            <h1>Capitalead Statistics</h1>
+            <h2>Welcome %s!</h2>
+
+            <table id="demo" class="table"></table>
+        </div>
+
+        <div class="footer">
+            <i class="fa fa-copyright"></i>
+           	Copyrighted material of Capitalead
+        </div>
+
+        <script>
+            loadXMLDoc()
+        </script>
+    """ % greet
+
+
 
 ## Creates a style tag
 ## @param sheet (string) name of a CSS stylesheet

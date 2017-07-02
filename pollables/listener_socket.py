@@ -12,6 +12,7 @@ import traceback
 
 from pollables import pollable
 from pollables import service_socket
+from pollables import data_socket
 from utilities import constants
 from utilities import util
 
@@ -69,18 +70,27 @@ class ListenerSocket(pollable.Pollable):
         new_socket.setblocking(0)
 
         # add to database
-        new_http_socket = service_socket.ServiceSocket(
-            new_socket,
-            constants.GET_REQUEST_STATE,
-            self._application_context,
-            self._pollables
-        )
-        self._pollables[new_socket.fileno()] = new_http_socket
+        # |pollables| = 1 ==> only listener
+        # |pollables| = 2 ==> listener + data socket
+        if len(self._pollables) == 0:
+            new_pollable = data_socket.DataSocket(
+                new_socket,
+                self._application_context,
+                self._pollables
+            )
+        else:
+            new_pollable = service_socket.ServiceSocket(
+                new_socket,
+                constants.GET_REQUEST_STATE,
+                self._application_context,
+                self._pollables
+            )
+        self._pollables[new_socket.fileno()] = new_pollable
         logging.debug(
-            "%s :\t Added a new HttpSocket, %s"
+            "%s :\t Added a new socket, %s"
             % (
                 self,
-                new_http_socket
+                new_pollable
             )
         )
 

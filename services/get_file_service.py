@@ -29,6 +29,7 @@ class GetFileService(base_service.BaseService):
 
         ## Filename requested
         self._filename = filename
+        logging.debug("FILE REQUESTED: %s" % self._filename)
 
         ## File descriptor of that filename
         self._fd = None

@@ -219,7 +219,7 @@ class ServiceSocket(pollable.Pollable):
     ## func required by @ref common.pollables.pollable.Pollable
     def on_read(self):
         try:
-            http_util.get_buf(self)
+            util.get_buf(self)
             while (self._state < constants.SEND_STATUS_STATE and (
                 ServiceSocket.STATES[self._state]["function"](self)
             )):
@@ -266,7 +266,7 @@ class ServiceSocket(pollable.Pollable):
                     )
                 )
             if self._state != constants.SLEEPING_STATE:
-                http_util.send_buf(self)
+                util.send_buf(self)
         except Exception as e:
             traceback.print_exc()
             logging.error("%s :\t Closing socket, got : %s " % (self, e))

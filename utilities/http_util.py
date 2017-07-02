@@ -195,37 +195,6 @@ def send_request_state(entry):
 
 # OTHER UTIL
 
-## function that sends whatever the socket has in data_to_send
-## @param entry (@ref common.pollables.pollable.Pollable)
-def send_buf(entry):
-    try:
-        while entry.data_to_send != "":
-            entry.data_to_send = entry.data_to_send[
-                entry.socket.send(entry.data_to_send):
-            ]
-    except socket.error as e:
-        if e.errno not in (errno.EAGAIN, errno.EWOULDBLOCK):
-            raise
-        logging.debug("%s :\t Haven't finished reading yet" % entry)
-
-## function that recieves whatever the socket can recieve and updates
-## the recvd_data buffer
-## @param entry (@ref common.pollables.pollable.Pollable)
-def get_buf(entry):
-    try:
-        t = entry.socket.recv(constants.MAX_BUFFER)
-        if not t:
-            raise util.Disconnect(
-                'Disconnected while recieving content'
-            )
-        entry.recvd_data += t
-
-    except socket.error as e:
-        traceback.print_exc()
-        if e.errno not in (errno.EAGAIN, errno.EWOULDBLOCK):
-            raise
-        logging.debug("%s :\t Haven't finished writing yet" % entry)
-
 ## Adds an error response_status to the data_to_send buffer
 ## @param entry (@ref common.pollables.pollable.Pollable) socket we're
 ## handling currently.
