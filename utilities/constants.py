@@ -88,7 +88,6 @@ MIME_MAPPING = {
 ## Dict of all the mdoules of services a Server can use
 HTTP_SERVICES = [
     "services.login_service",
-    "services.update_service",
     "services.get_file_service",
 ]
 

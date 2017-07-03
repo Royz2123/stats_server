@@ -99,16 +99,21 @@ class DataSocket(pollable.Pollable):
     def on_close(self):
         self._socket.close()
 
-
     def fixed_data(self, parsed_data):
         # parsed_data - list of fixed data numbers
         # these need to be written into the xml file
         self._application_context["Statistics"] = {}
+
+        # set statistics
         for fixed_data in parsed_data:
-            self._application_context["Statistics"]["a%s" % fixed_data] = {
-                "s" : " -- ",
-                "t" : " -- ",
+            self._application_context["Statistics"][fixed_data] = {
+                "sc" : "f",
+                "sc" : "f",
+                "s" : "--",
+                "t" : "--",
             }
+
+        # write into xml file
         util.open_and_write(
             self._application_context["stats_file"],
             dicttoxml.dicttoxml(
@@ -118,10 +123,18 @@ class DataSocket(pollable.Pollable):
 
     def query(self, parsed_data):
         f, s, t = tuple(parsed_data)
-        self._application_context["Statistics"][f] = {
-            "s" : s,
-            "t" : t,
-        }
+
+        # set colors based on changes
+        if self._application_context["Statistics"][f]["s"] not in (s, "--"):
+            self._application_context["Statistics"][f]["sc"] = "t"
+        elif self._application_context["Statistics"][f]["t"] not in (t, "--"):
+            self._application_context["Statistics"][f]["tc"] = "t"
+
+        # set data
+        self._application_context["Statistics"][f]["s"] = s
+        self._application_context["Statistics"][f]["t"] = t
+
+        # write into xml file
         util.open_and_write(
             self._application_context["stats_file"],
             dicttoxml.dicttoxml(

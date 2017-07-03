@@ -28,7 +28,7 @@ function parseXML(xml) {
         '<thead>' +
             '<tr>' +
                 '<th></th>' +
-                '<th> hello </th>' +
+                '<th> שחר </th>' +
                 '<th> מחיר ביקוש </th>' +
                 '<th> מחיר היצע </th>' +
             '</tr>' +
@@ -42,25 +42,19 @@ function parseXML(xml) {
         table += '<tr>' + '<td class="center">' + (i+1) + '</td>';
         table += '<td class="colored_cell">' + rows[i].nodeName.slice(1) + '</td>';
 
-        switch (rows[i].nodeName.slice(0, 1)) {
-            case "b":
-                table += '<td class="colored">' + rows[i].getElementsByTagName("s")[0].childNodes[0].nodeValue + '</td>';
-                table += '<td>' + rows[i].getElementsByTagName("t")[0].childNodes[0].nodeValue + '</td>';
-                break;
-            case "c":
-                table += '<td>' + rows[i].getElementsByTagName("s")[0].childNodes[0].nodeValue + '</td>';
-                table += '<td class="colored">' + rows[i].getElementsByTagName("t")[0].childNodes[0].nodeValue + '</td>';
-                break;
-            case "d":
-                table += '<td class="colored">' + rows[i].getElementsByTagName("s")[0].childNodes[0].nodeValue + '</td>';
-                table += '<td class="colored">' + rows[i].getElementsByTagName("t")[0].childNodes[0].nodeValue + '</td>';
-                break;
-            default:
-                table += '<td>' + rows[i].getElementsByTagName("s")[0].childNodes[0].nodeValue + '</td>';
-                table += '<td>' + rows[i].getElementsByTagName("t")[0].childNodes[0].nodeValue + '</td>';
+        if (rows[i].getElementsByTagName("sc")[0].childNodes[0].nodeValue == "t"){
+            table += '<td class="colored">';
+        } else {
+            table += '<td>';
         }
-        table += '</tr>';
+        table += rows[i].getElementsByTagName("s")[0].childNodes[0].nodeValue + '</td>';
 
+        if (rows[i].getElementsByTagName("tc")[0].childNodes[0].nodeValue == "t"){
+            table += '<td class="colored">';
+        } else {
+            table += '<td>';
+        }
+        table += rows[i].getElementsByTagName("t")[0].childNodes[0].nodeValue + '</td>' + '</tr>';
     }
     table += '</tbody>'
 

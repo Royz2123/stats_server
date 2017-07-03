@@ -5,6 +5,7 @@
 
 import contextlib
 import datetime
+import dicttoxml
 import errno
 import logging
 import os
@@ -92,6 +93,23 @@ class GetFileService(base_service.BaseService):
         # if finished reading file, exit
         if len(buf) == 0:
             os.close(self._fd)
+
+            # need to update colors if we are talking about table.xml
+            # if self._filename.split("/")[-1].find("table") != -1:
+            #    # table.xml requested. update colors.
+            #     for fd, cd in entry.application_context["Statistics"].items():
+            #        cd["sc"] = "f"
+            #        cd["tc"] = "f"
+
+            #   print entry.application_context["Statistics"]
+            #    time.sleep(5)
+
+            #    util.open_and_write(
+            #        entry.application_context["stats_file"],
+            #        dicttoxml.dicttoxml(
+            #            {"stats" : entry.application_context["Statistics"]}
+            #        )
+            #    )
             return True
 
         # update read content and notify that there might be more content
