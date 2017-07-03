@@ -1,7 +1,7 @@
 
 body {
     font-family: 'Open Sans', sans-serif;
-    color: #A7A1AE;
+    color: #000000;
     background-color: #e0eaf9;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -55,35 +55,35 @@ p {
 }
 
 .table {
-    text-align: left;
+    text-align:center;
+    vertical-align:middle;
     overflow: hidden;
     width: 80%;
     margin: 0 auto;
-    background-color: #1F2739;
+    background-color: #232323;
     margin-bottom: 100px;
 }
 
 .table thead {
     font-weight: bold;
     font-size: 1em;
-    text-align: left;
-    color: #185875;
+    text-align:center;
+    vertical-align:middle;
+    color: #000000;
 }
 
 .table td {
+    text-align:center;
+    vertical-align:middle;
     font-size: 1em;
 }
 
 .table th {
-    background-color: #1F2739;
+    background-color: #a3a1a1;
 }
 
-.table tr:nth-child(odd) {
-    background-color: #323C50;
-}
-
-.table tr:nth-child(even) {
-    background-color: #2C3446;
+.table tr {
+    background-color: #cecece;
 }
 
 .table td, .table th {
@@ -96,40 +96,32 @@ p {
     text-align: center;
     padding-left: 0.5%;
     padding-right: 0.5%;
-    color: #FB667A;
-}
-
-.table td:hover {
-    background-color: #185875;
-    color: #fff;
-    text-shadow: 1px 1px 4px white;
-
-    transition-duration: 0.6s;
+    color: #000000;
 }
 
 .colored {
-  -webkit-animation: fadeout 1s; /* Safari, Chrome and Opera > 12.1 */
-     -moz-animation: fadeout 1s; /* Firefox < 16 */
-      -ms-animation: fadeout 1s; /* Internet Explorer */
-       -o-animation: fadeout 1s; /* Opera < 12.1 */
-          animation: fadeout 1s;
+  -webkit-animation: fadeout 1.5s; /* Safari, Chrome and Opera > 12.1 */
+     -moz-animation: fadeout 1.5s; /* Firefox < 16 */
+      -ms-animation: fadeout 1.5s; /* Internet Explorer */
+       -o-animation: fadeout 1.5s; /* Opera < 12.1 */
+          animation: fadeout 1.5s;
 }
 
 @keyframes fadeout {
   from { background-color: #cccc00; }
-  to   { background-color: #323C50; }
+  to   { background-color: #cecece; }
 }
 
 /* Firefox < 16 */
 @-moz-keyframes fadeout {
   from { background-color: #cccc00; }
-  to   { background-color: #323C50; }
+  to   { background-color: #cecece; }
 }
 
 /* Safari, Chrome and Opera > 12.1 */
 @-webkit-keyframes fadeout {
   from { background-color: #cccc00; }
-  to   { background-color: #323C50; }
+  to   { background-color: #cecece; }
 }
 
 /* Internet Explorer */
@@ -145,7 +137,6 @@ p {
     background-color: #323C50;
     margin-top: 50%;
 }
-
 
 .description {
     font-size: 1.5em;

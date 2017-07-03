@@ -1,7 +1,9 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 ## @package RAID5.common.utilities.html_util
 # Module that defines many html functions for use of HTTP services
 #
+
 
 import errno
 import logging
@@ -56,11 +58,11 @@ def create_html_page(
 
 
 def create_stats_page(greet):
-    return """
+    return (u"""
         <div class="content-space">
             <h1>Capitalead Statistics</h1>
-            <h2>Welcome %s!</h2>
-
+            <h2 dir="rtl">Welcome!</h2>
+            <br><br><br>
             <table id="demo" class="table"></table>
         </div>
 
@@ -72,7 +74,7 @@ def create_stats_page(greet):
         <script>
             loadXMLDoc()
         </script>
-    """ % greet
+    """)
 
 
 

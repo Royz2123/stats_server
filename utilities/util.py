@@ -14,6 +14,15 @@ import uuid
 
 from utilities import constants
 
+
+## Generates a string for a cookie
+def generate_cookie(length=constants.COOKIE_LENGTH):
+    return ''.join(random.choice(
+        string.ascii_uppercase + string.digits
+        ) for i in range(length)
+    )
+
+
 ## Converts a string address to tuple
 ## @param address (string) address as address:port
 ## @returns address (tuple) returns (address, port)

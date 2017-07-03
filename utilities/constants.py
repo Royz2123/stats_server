@@ -41,6 +41,9 @@ MAX_CONNECTIONS = 1000
 USERS_SEPERATOR = '$'
 CREDENTIALS_SEPERATOR = ':'
 
+## Length of a Session Cookie
+COOKIE_LENGTH  = 15
+
 ## CRLF new line
 CRLF = '\r\n'
 CRLF_BIN = CRLF.encode('utf-8')
@@ -89,6 +92,14 @@ MIME_MAPPING = {
 HTTP_SERVICES = [
     "services.login_service",
     "services.get_file_service",
+]
+
+## files that don't aquire cookies for display
+NO_AUTH_FILES = [
+    "homepage.html",
+    "img_avatar2.png",
+    "favicon.ico",
+    "style.css",
 ]
 
 ## HTTP States

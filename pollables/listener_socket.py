@@ -8,6 +8,7 @@ import logging
 import os
 import select
 import socket
+import time
 import traceback
 
 from pollables import pollable
@@ -72,7 +73,7 @@ class ListenerSocket(pollable.Pollable):
         # add to database
         # |pollables| = 1 ==> only listener
         # |pollables| = 2 ==> listener + data socket
-        if len(self._pollables) == 0:
+        if len(self._pollables) == 1:
             new_pollable = data_socket.DataSocket(
                 new_socket,
                 self._application_context,

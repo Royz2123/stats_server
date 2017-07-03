@@ -93,6 +93,7 @@ def main():
         "users_file" : args.users_file,
         "stats_file" : constants.DEFAULT_STATS_FILE,
         "Statistics" : {},
+        "users" : {},
     }
     server = async_server.AsyncServer(application_context)
     server.run()

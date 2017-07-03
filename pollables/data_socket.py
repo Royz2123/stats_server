@@ -9,6 +9,7 @@ import logging
 import os
 import select
 import socket
+import time
 import traceback
 
 from pollables import pollable
@@ -106,9 +107,9 @@ class DataSocket(pollable.Pollable):
 
         # set statistics
         for fixed_data in parsed_data:
-            self._application_context["Statistics"][fixed_data] = {
+            self._application_context["Statistics"]["a%s" % fixed_data] = {
                 "sc" : "f",
-                "sc" : "f",
+                "tc" : "f",
                 "s" : "--",
                 "t" : "--",
             }
@@ -125,14 +126,14 @@ class DataSocket(pollable.Pollable):
         f, s, t = tuple(parsed_data)
 
         # set colors based on changes
-        if self._application_context["Statistics"][f]["s"] not in (s, "--"):
-            self._application_context["Statistics"][f]["sc"] = "t"
-        elif self._application_context["Statistics"][f]["t"] not in (t, "--"):
-            self._application_context["Statistics"][f]["tc"] = "t"
+        if self._application_context["Statistics"]["a%s" % f]["s"] not in (s, "--"):
+            self._application_context["Statistics"]["a%s" % f]["sc"] = "t"
+        elif self._application_context["Statistics"]["a%s" % f]["t"] not in (t, "--"):
+            self._application_context["Statistics"]["a%s" % f]["tc"] = "t"
 
         # set data
-        self._application_context["Statistics"][f]["s"] = s
-        self._application_context["Statistics"][f]["t"] = t
+        self._application_context["Statistics"]["a%s" % f]["s"] = s
+        self._application_context["Statistics"]["a%s" % f]["t"] = t
 
         # write into xml file
         util.open_and_write(
@@ -143,7 +144,9 @@ class DataSocket(pollable.Pollable):
         )
 
     def delete(self, parsed_data):
-        self.fixed_data(self._application_context["Statistics"].keys())
+        self.fixed_data([
+            a[1:] for key in self._application_context["Statistics"].keys()
+        ])
 
     def info(self, parsed_data):
         self._recvd_data = "Coming Soon..."
@@ -165,8 +168,10 @@ class DataSocket(pollable.Pollable):
             while len(self._recvd_data):
                 # create packet
                 if self._packet_size == 0:
+                    if len(self._recvd_data) < 4:
+                        break
                     self._packet_size = ord(self._recvd_data[0])
-                    self._recvd_data = self._recvd_data[1:]
+                    self._recvd_data = self._recvd_data[4:]
 
                 if len(self._recvd_data) < self._packet_size:
                     break

@@ -25,7 +25,7 @@ function parseXML(xml) {
 
     // Create table headers
     table =
-        '<thead>' +
+        '<thead dir="rtl">' +
             '<tr>' +
                 '<th></th>' +
                 '<th> שחר </th>' +
@@ -33,7 +33,7 @@ function parseXML(xml) {
                 '<th> מחיר היצע </th>' +
             '</tr>' +
         '</thead>' +
-        '<tbody>'
+        '<tbody dir="rtl">'
     ;
 
     // Update all the rows from the XML

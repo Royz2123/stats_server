@@ -26,7 +26,7 @@ class GetFileService(base_service.BaseService):
     # common.pollables.service_socket) using the service
     # @param filename (string) file requested by user
     def __init__(self, entry, filename):
-        super(GetFileService, self).__init__([])
+        super(GetFileService, self).__init__(["Cookie"])
 
         ## Filename requested
         self._filename = filename
@@ -48,6 +48,28 @@ class GetFileService(base_service.BaseService):
     ## to
     ## @returns finished (bool) returns true if finished
     def before_response_status(self, entry):
+        print entry.request_context["headers"]
+
+        no_auth_file = False
+        for filename in constants.NO_AUTH_FILES:
+            if self._filename.split("/")[-1].find(filename) != -1:
+                no_auth_file = True
+
+        cookie_auth = False
+        if "Cookie" in entry.request_context["headers"].keys():
+            session_cookie = entry.request_context[
+                "headers"
+            ]["Cookie"].split(';')[0].strip()
+            username, auth = tuple(session_cookie.split('=', 1))
+            cookie_auth = (
+                auth
+                == entry.application_context["users"][username]["cookie"]
+            )
+
+        if not (no_auth_file or cookie_auth):
+            self._response_status = 401
+            return
+
         try:
             self._fd = os.open(
                 self._filename,
@@ -95,21 +117,18 @@ class GetFileService(base_service.BaseService):
             os.close(self._fd)
 
             # need to update colors if we are talking about table.xml
-            # if self._filename.split("/")[-1].find("table") != -1:
-            #    # table.xml requested. update colors.
-            #     for fd, cd in entry.application_context["Statistics"].items():
-            #        cd["sc"] = "f"
-            #        cd["tc"] = "f"
+            if self._filename.split("/")[-1].find("table") != -1:
+                # table.xml requested. update colors.
+                for fd, cd in entry.application_context["Statistics"].items():
+                    cd["sc"] = "f"
+                    cd["tc"] = "f"
 
-            #   print entry.application_context["Statistics"]
-            #    time.sleep(5)
-
-            #    util.open_and_write(
-            #        entry.application_context["stats_file"],
-            #        dicttoxml.dicttoxml(
-            #            {"stats" : entry.application_context["Statistics"]}
-            #        )
-            #    )
+                util.open_and_write(
+                    entry.application_context["stats_file"],
+                    dicttoxml.dicttoxml(
+                        {"stats" : entry.application_context["Statistics"]}
+                    )
+                )
             return True
 
         # update read content and notify that there might be more content

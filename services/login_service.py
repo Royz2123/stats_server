@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 ## @package RAID5.block_device.services.login_service
 # Module that implements the Block Device LoginService
 #
@@ -6,6 +7,7 @@
 import errno
 import logging
 import os
+import random
 import socket
 import time
 import traceback
@@ -64,12 +66,22 @@ class LoginService(base_service.BaseService):
             ):
                 raise RuntimeError("Invalid Credentials")
 
+            # document this login
+            entry.application_context["users"][req_name] = {
+                "timestamp" : time.time(),
+                "cookie" : util.generate_cookie(),
+            }
+
             self._response_content = html_util.create_html_page(
                 html_util.create_stats_page(greet),
                 header="Capitalead - Statistics",
             )
             self._response_headers = {
-                "Content-Length": len(self._response_content)
+                "Content-Length": len(self._response_content),
+                "Set-Cookie" : "%s=%s" % (
+                    req_name,
+                    entry.application_context["users"][req_name]["cookie"]
+                )
             }
         except Exception as e:
             traceback.print_exc()

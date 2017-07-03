@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 ## @package RAID5.common.utilities.http_util
 # Module with all the HTTP state functions
 #
