@@ -128,7 +128,8 @@ class DataSocket(pollable.Pollable):
         # set colors based on changes
         if self._application_context["Statistics"]["a%s" % f]["s"] not in (s, "--"):
             self._application_context["Statistics"]["a%s" % f]["sc"] = "t"
-        elif self._application_context["Statistics"]["a%s" % f]["t"] not in (t, "--"):
+
+        if self._application_context["Statistics"]["a%s" % f]["t"] not in (t, "--"):
             self._application_context["Statistics"]["a%s" % f]["tc"] = "t"
 
         # set data

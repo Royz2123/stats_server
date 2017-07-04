@@ -100,6 +100,9 @@ NO_AUTH_FILES = [
     "img_avatar2.png",
     "favicon.ico",
     "style.css",
+    "not_found.html",
+    "unauthorized.html",
+    "homepage_retry.html",
 ]
 
 ## HTTP States

@@ -83,6 +83,14 @@ class LoginService(base_service.BaseService):
                     entry.application_context["users"][req_name]["cookie"]
                 )
             }
+        except RuntimeError as e:
+            logging.warning("Bad Credentials Entered")
+            self._response_content = html_util.create_html_page(
+                "",
+                header="Capitalead - Retry Login",
+                refresh=0,
+                redirect_url="homepage_retry.html",
+            )
         except Exception as e:
             traceback.print_exc()
             self._response_status = 401

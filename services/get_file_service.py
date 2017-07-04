@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 ## @package RAID5.common.services.get_file_service
 # Module that implements the GetFileService service
 #
@@ -15,6 +16,7 @@ import traceback
 
 from services import base_service
 from utilities import constants
+from utilities import html_util
 from utilities import util
 
 ## GetFileService is a HTTP Service class that sends back to the requester a
@@ -48,8 +50,6 @@ class GetFileService(base_service.BaseService):
     ## to
     ## @returns finished (bool) returns true if finished
     def before_response_status(self, entry):
-        print entry.request_context["headers"]
-
         no_auth_file = False
         for filename in constants.NO_AUTH_FILES:
             if self._filename.split("/")[-1].find(filename) != -1:
@@ -62,20 +62,22 @@ class GetFileService(base_service.BaseService):
             ]["Cookie"].split(';')[0].strip()
             username, auth = tuple(session_cookie.split('=', 1))
             cookie_auth = (
-                auth
-                == entry.application_context["users"][username]["cookie"]
+                username in entry.application_context["users"].keys() and
+                auth == entry.application_context["users"][username]["cookie"]
             )
 
-        if not (no_auth_file or cookie_auth):
-            self._response_status = 401
-            return
-
         try:
+            # check if file exists (will throw exception if not)
             self._fd = os.open(
                 self._filename,
                 os.O_RDONLY | os.O_BINARY,
                 0o666
             )
+
+            # check if authorized to view file
+            if not (no_auth_file or cookie_auth):
+                raise RuntimeError("Unauthorized Request")
+
             self._response_headers = {
                 "Content-Length": os.fstat(self._fd).st_size,
                 "Content-Type": constants.MIME_MAPPING.get(
@@ -85,11 +87,26 @@ class GetFileService(base_service.BaseService):
                     'txt/html',
                 )
             }
+        except RuntimeError as e:
+            logging.warning("User made bad request")
+            self._response_status = 401
+            self._response_content = html_util.create_html_page(
+                "",
+                header="Capitalead - Unauthorized",
+                refresh=0,
+                redirect_url="unauthorized.html",
+            )
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
             logging.error("%s :\t File not found " % entry)
             self._response_status = 404
+            self._response_content = html_util.create_html_page(
+                "",
+                header="Capitalead - File not Found",
+                refresh=0,
+                redirect_url="not_found.html",
+            )
         except Exception as e:
             logging.error("%s :\t %s " % (entry, e))
             self._response_status = 500
@@ -107,6 +124,7 @@ class GetFileService(base_service.BaseService):
     ):
         # exit if not reading from file
         if self._response_status != 200:
+            # error message might be in response_content
             return True
 
         # read buf from file

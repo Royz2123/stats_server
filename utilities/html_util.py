@@ -58,10 +58,10 @@ def create_html_page(
 
 
 def create_stats_page(greet):
-    return (u"""
+    return ("""
         <div class="content-space">
             <h1>Capitalead Statistics</h1>
-            <h2 dir="rtl">Welcome!</h2>
+            <h2 dir="rtl">ברוך הבא %s</h2>
             <br><br><br>
             <table id="demo" class="table"></table>
         </div>
@@ -74,7 +74,7 @@ def create_stats_page(greet):
         <script>
             loadXMLDoc()
         </script>
-    """)
+    """) % greet
 
 
 

@@ -100,36 +100,44 @@ p {
 }
 
 .colored {
-  -webkit-animation: fadeout 1.5s; /* Safari, Chrome and Opera > 12.1 */
-     -moz-animation: fadeout 1.5s; /* Firefox < 16 */
-      -ms-animation: fadeout 1.5s; /* Internet Explorer */
-       -o-animation: fadeout 1.5s; /* Opera < 12.1 */
-          animation: fadeout 1.5s;
+  -webkit-animation: fadeout 2s; /* Safari, Chrome and Opera > 12.1 */
+     -moz-animation: fadeout 2s; /* Firefox < 16 */
+      -ms-animation: fadeout 2s; /* Internet Explorer */
+       -o-animation: fadeout 2s; /* Opera < 12.1 */
+          animation: fadeout 2s;
 }
 
 @keyframes fadeout {
-  from { background-color: #cccc00; }
-  to   { background-color: #cecece; }
+  0% { background-color: #cccc00; }
+  50% { background-color: #cccc00; }
+  100% { background-color: #cecece; }
 }
 
 /* Firefox < 16 */
 @-moz-keyframes fadeout {
-  from { background-color: #cccc00; }
-  to   { background-color: #cecece; }
+  0% { background-color: #cccc00; }
+  50% { background-color: #cccc00; }
+  100% { background-color: #cecece; }
 }
 
 /* Safari, Chrome and Opera > 12.1 */
 @-webkit-keyframes fadeout {
-  from { background-color: #cccc00; }
-  to   { background-color: #cecece; }
+  0% { background-color: #cccc00; }
+  50% { background-color: #cccc00; }
+  100% { background-color: #cecece; }
 }
 
 /* Internet Explorer */
 @-ms-keyframes fadeout {
-  from { background-color: #cccc00; }
-  to   { background-color: #323C50; }
+  0% { background-color: #cccc00; }
+  50% { background-color: #cccc00; }
+  100% { background-color: #323C50; }
 }
 
+
+.bad_creds {
+    color: red;
+}
 
 .page_divider {
     width: 100%;
@@ -137,21 +145,6 @@ p {
     background-color: #323C50;
     margin-top: 50%;
 }
-
-.description {
-    font-size: 1.5em;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    padding-left: 60px;
-    position: relative;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 5%;
-    text-align: center;
-    width: 90%;
-}
-
 
 .footer {
     position: fixed;
@@ -163,12 +156,17 @@ p {
     text-align: center;
 }
 
+
+
 .form-submit-button {
+    display: block;
+    margin: auto;
+    width: 100px;
+    height: 50px;
     background: #B9DFFF;
     color: #fff;
-    border: 1px solid #eee;
+    border: 5px solid #eee;
     border-radius: 20px;
-    box-shadow: 5px 5px 5px #eee;
     text-shadow:none;
 }
 
@@ -179,6 +177,7 @@ p {
     border-radius: 20px;
     box-shadow: 5px 5px 5px #eee;
     text-shadow:none;
+    transition: 1s;
 }
 
 form {
@@ -186,9 +185,9 @@ form {
 }
 
 input[type=text], input[type=password] {
-    width: 100%;
+    width: 80%;
     padding: 12px 20px;
-    margin: 8px 0;
+    margin: 3px 10%;
     display: inline-block;
     border: 1px solid #ccc;
     box-sizing: border-box;

@@ -15,6 +15,29 @@ import uuid
 from utilities import constants
 
 
+
+# Important Error classes
+
+## Disconnect Error. called when a socket has disconnected ungraceully.
+## Inherits from RuntimeError.
+class Disconnect(RuntimeError):
+
+    ## Constructor for Disconnect
+    ## @param desc (optional) (string) string descrbing the disconnection
+    def __init__(self, desc="Disconnect"):
+        super(Disconnect, self).__init__(desc)
+
+## InvalidArguments Error.
+## Called when recieved invalid arguments for a request from a service.
+## Inherits from RuntimeError.
+class InvalidArguments(RuntimeError):
+
+    ## Constructor for InvalidArguments.
+    ## @param desc (optional) (string) string descrbing the invalid arguments
+    def __init__(self, desc="Bad Arguments"):
+        super(InvalidArguments, self).__init__(desc)
+
+
 ## Generates a string for a cookie
 def generate_cookie(length=constants.COOKIE_LENGTH):
     return ''.join(random.choice(
@@ -76,7 +99,7 @@ def get_buf(entry):
     try:
         t = entry.socket.recv(constants.MAX_BUFFER)
         if not t:
-            raise util.Disconnect(
+            raise Disconnect(
                 'Disconnected while recieving content'
             )
         entry.recvd_data += t
@@ -110,27 +133,3 @@ def parse_header(line):
     if n == -1:
         raise RuntimeError('Invalid header received')
     return line[:n].rstrip(), line[n + len(SEP):].lstrip()
-
-
-
-
-# Important Error classes
-
-## Disconnect Error. called when a socket has disconnected ungraceully.
-## Inherits from RuntimeError.
-class Disconnect(RuntimeError):
-
-    ## Constructor for Disconnect
-    ## @param desc (optional) (string) string descrbing the disconnection
-    def __init__(self, desc="Disconnect"):
-        super(Disconnect, self).__init__(desc)
-
-## InvalidArguments Error.
-## Called when recieved invalid arguments for a request from a service.
-## Inherits from RuntimeError.
-class InvalidArguments(RuntimeError):
-
-    ## Constructor for InvalidArguments.
-    ## @param desc (optional) (string) string descrbing the invalid arguments
-    def __init__(self, desc="Bad Arguments"):
-        super(InvalidArguments, self).__init__(desc)

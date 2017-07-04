@@ -9,6 +9,11 @@ import errno
 import logging
 import os
 import signal
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 import traceback
 
 from utilities import async_server

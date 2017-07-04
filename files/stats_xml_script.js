@@ -40,7 +40,7 @@ function parseXML(xml) {
     var rows = xmlDoc.getElementsByTagName("stats")[0].childNodes;
     for (i = 0; i < rows.length; i++) {
         table += '<tr>' + '<td class="center">' + (i+1) + '</td>';
-        table += '<td class="colored_cell">' + rows[i].nodeName.slice(1) + '</td>';
+        table += '<td>' + rows[i].nodeName.slice(1) + '</td>';
 
         if (rows[i].getElementsByTagName("sc")[0].childNodes[0].nodeValue == "t"){
             table += '<td class="colored">';
