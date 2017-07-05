@@ -70,6 +70,12 @@ DEFAULT_STATS_FILE = "files/table.xml"
 DEFAULT_USERS_FILE = "users.txt"
 MAX_USERS_FILE_SIZE = 10000
 
+## Listener types
+(
+    LISTENER_DATA,
+    LISTENER_SERVICE,
+)=range(2)
+
 ## Default time until page refreshes. Once refreshed, the frontend server
 ## checks for terminated connections of disks
 DEFAULT_REFRESH_TIME = 6

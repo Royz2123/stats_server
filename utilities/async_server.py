@@ -37,7 +37,7 @@ class AsyncServer(object):
         self._pollables = {}
 
     ## Add a ListenerSocket to the pollables dict
-    def add_listener(self):
+    def add_listener(self, port, listener_type):
         sock = socket.socket(
             family=socket.AF_INET,
             type=socket.SOCK_STREAM,
@@ -46,22 +46,26 @@ class AsyncServer(object):
         sock.setblocking(0)
 
         # bind to the server address
-        sock.bind((
-            self._application_context["bind_address"],
-            self._application_context["bind_port"]
-        ))
+        sock.bind((self._application_context["bind_address"], port))
         sock.listen(10)
         self._pollables[sock.fileno()] = listener_socket.ListenerSocket(
             sock,
             self._application_context,
-            self._pollables
+            self._pollables,
+            listener_type,
         )
 
     ## Specifies what server should do when starting up
     def on_start(self):
         # Add a listener, for service requests that the server offers
-        self.add_listener()
-
+        self.add_listener(
+            self._application_context["bind_port"],
+            constants.LISTENER_SERVICE
+        )
+        self.add_listener(
+            7000,
+            constants.LISTENER_DATA
+        )
 
     ## Handle events from poller for all file descriptors specified.
     ## @param events (dict) dictionary specifying all of the polled events.

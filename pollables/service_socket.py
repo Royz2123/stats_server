@@ -168,7 +168,6 @@ class ServiceSocket(pollable.Pollable):
     ## Calls the before_terminate service function then closes the socket
     ## required by @ref common.pollables.pollable.Pollable
     def on_close(self):
-        print "CLOSED SOCKET"
         self._service.before_terminate(self)
         self._socket.close()
 

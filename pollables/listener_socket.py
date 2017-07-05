@@ -29,12 +29,21 @@ class ListenerSocket(pollable.Pollable):
     # device
     # @param pollables (dict) all of the pollables in the server, so that it
     # can add new ones upon connection
-    def __init__(self, socket, application_context, pollables):
+    def __init__(
+        self,
+        socket,
+        application_context,
+        pollables,
+        listener_type,
+    ):
         ## Application_context
         self._application_context = application_context
 
         ## Socket to work with
         self._socket = socket
+
+        ## Listener type
+        self._listener_type = listener_type
 
         ## File descriptor of socket
         self._fd = socket.fileno()
@@ -73,7 +82,7 @@ class ListenerSocket(pollable.Pollable):
         # add to database
         # |pollables| = 1 ==> only listener
         # |pollables| = 2 ==> listener + data socket
-        if len(self._pollables) == 1:
+        if self._listener_type == constants.LISTENER_DATA:
             new_pollable = data_socket.DataSocket(
                 new_socket,
                 self._application_context,

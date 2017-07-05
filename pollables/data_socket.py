@@ -20,9 +20,14 @@ from utilities import util
 ## A Socket that listens to new updated data.
 class DataSocket(pollable.Pollable):
     (
-        DATA_STATE,
+        SEND_CONNECT_STATE,
+        RECV_CONNECT_STATE,
+        SEND_LOGIN_STATE,
+        SEND_SHAHAR_STATE,
+        RECV_SHAHAR_STATE,
+        RECV_DATA_STATE,
         CLOSING_STATE,
-    )=range(2)
+    )=range(7)
 
     ## Constructor for DataSocket
     # @param socket (socket) async socket we work with
@@ -41,10 +46,11 @@ class DataSocket(pollable.Pollable):
         self._fd = socket.fileno()
 
         ## Current state the socket is in
-        self._state = DataSocket.DATA_STATE
+        self._state = DataSocket.SEND_CONNECT_STATE
 
         ## Data need to send back to moshe
-        self._data_to_send = ""
+        self._data_to_send = "IsConnected?"
+        self.create_packet()
 
         ## Pointer to all the pollables in the server
         self._recvd_data = ""
@@ -127,7 +133,7 @@ class DataSocket(pollable.Pollable):
         )
 
     def query(self, parsed_data):
-        f, s, t = tuple(parsed_data)
+        f, ign1, ign2, s, t = tuple(parsed_data)
 
         # set colors based on changes
         if self._application_context["Statistics"]["a%s" % f]["s"] not in (s, "--"):
@@ -148,9 +154,9 @@ class DataSocket(pollable.Pollable):
             )
         )
 
-    def delete(self, parsed_data):
+    def delete(self):
         self.fixed_data([
-            a[1:] for key in self._application_context["Statistics"].keys()
+            key[1:] for key in self._application_context["Statistics"].keys()
         ])
 
     def info(self, parsed_data):
@@ -162,48 +168,59 @@ class DataSocket(pollable.Pollable):
                 info["timestamp"]
             )
         self._data_to_send = self._data_to_send[:-1]
-
-        self._data_to_send = (
-            struct.pack('>I', len(self._data_to_send))
-            + self._data_to_send
-        )
-
-
-    DATA_REQUEST = {
-        'fd' : fixed_data,
-        'q' : query,
-        'x' : delete,
-        'i' : info,
-    }
+        self.create_packet()
 
     ## What DataSocket does on read.
     ## func required by @ref pollables.pollable.Pollable
     def on_read(self):
+        # recv buffer
+        util.get_buf(self)
+
         try:
-            # recv buffer
-            util.get_buf(self)
+            if self._state == DataSocket.RECV_CONNECT_STATE:
+                if (
+                    (not self.check_packet()) and
+                    (not self.check_prefix("Connected=Yes"))
+                ):
+                    return
+                # handle connection (not interesting)
+                self._recvd_data = ""
 
-            while len(self._recvd_data):
-                # create packet
-                if self._packet_size == 0:
-                    if len(self._recvd_data) < 4:
-                        break
-                    self._packet_size = ord(self._recvd_data[0])
-                    self._recvd_data = self._recvd_data[4:]
+                # Prepare packet to send
+                self._data_to_send = "Login:user,pass"
+                self.create_packet()
+                self._state = DataSocket.SEND_LOGIN_STATE
 
-                if len(self._recvd_data) < self._packet_size:
-                    break
+            if self._state == DataSocket.RECV_SHAHAR_STATE:
+                if (
+                    (not self.check_packet()) and
+                    (not self.check_prefix("ShaharList="))
+                ):
+                    return
 
-                # packet fully recieved
-                parsed_data, self._recvd_data = (
-                    self._recvd_data[:self._packet_size].split(','),
-                    self._recvd_data[self._packet_size:],
-                )
-                DataSocket.DATA_REQUEST[parsed_data[0]](self, parsed_data[1:])
+                # Got the SHACHAR numbers, process them
+                self.fixed_data(self._recvd_data.split(','))
+                self._recvd_data = ""
 
-                # get ready for the next packet
-                self._recvd_data = self._recvd_data[self._packet_size:]
+                # Finally move on to data part
                 self._packet_size = 0
+                self._state = DataSocket.RECV_DATA_STATE
+
+            if self._state == DataSocket.RECV_DATA_STATE:
+                while len(self._recvd_data):
+                    # check packet
+                    if not self.check_packet():
+                        return
+
+                    # manually check prefix (either QN or QX)
+                    if self.check_prefix("QN:"):
+                        self.query(self._recvd_data.split(','))
+                    elif self.check_prefix("QX"):
+                        self.delete()
+
+                    # get ready for the next packet
+                    self._recvd_data = self._recvd_data[self._packet_size:]
+                    self._packet_size = 0
 
         except Exception as e:
             logging.error("%s :\t %s" %
@@ -214,8 +231,70 @@ class DataSocket(pollable.Pollable):
             )
             self.on_error()
 
+    def check_packet(self):
+        if self._packet_size == 0:
+            if len(self._recvd_data) < 4:
+                return False
+            self._packet_size = ord(self._recvd_data[0])
+            self._recvd_data = self._recvd_data[4:]
+
+        if len(self._recvd_data) < self._packet_size:
+            return False
+        return True
+
+    def check_prefix(self, prefix):
+        if (
+            self._recvd_data[:len(prefix)]
+            == prefix
+        ):
+            self._recvd_data = self._recvd_data[len(prefix):]
+            return True
+        return False
+
+    def create_packet(self):
+        self._data_to_send = (
+            struct.pack('>I', len(self._data_to_send))
+            + self._data_to_send
+        )
+
     def on_write(self):
+        # send buffer
         util.send_buf(self)
+
+        try:
+            if self._state == DataSocket.SEND_CONNECT_STATE:
+                if len(self._data_to_send):
+                    return
+
+                # Get ready for next packet
+                self._packet_size = 0
+                self._state = DataSocket.RECV_CONNECT_STATE
+
+            if self._state == DataSocket.SEND_LOGIN_STATE:
+                if len(self._data_to_send):
+                    return
+
+                # Prepare packet to send
+                self._data_to_send = "GetShaharList"
+                self.create_packet()
+                self._state = DataSocket.SEND_SHAHAR_STATE
+
+            if self._state == DataSocket.SEND_SHAHAR_STATE:
+                if len(self._data_to_send):
+                    return
+
+                # Get ready for next packet
+                self._packet_size = 0
+                self._state = DataSocket.RECV_SHAHAR_STATE
+
+        except Exception as e:
+            logging.error("%s :\t %s" %
+                (
+                    self,
+                    traceback.print_exc()
+                )
+            )
+            self.on_error()
 
     ## What DeclarerSocket does on error.
     ## Sets state to closing state
@@ -228,9 +307,17 @@ class DataSocket(pollable.Pollable):
     # @returns event (event_mask)
     def get_events(self):
         event = constants.POLLERR
-        if self._state == DataSocket.DATA_STATE:
+        if self._state in [
+            DataSocket.RECV_SHAHAR_STATE,
+            DataSocket.RECV_CONNECT_STATE,
+            DataSocket.RECV_DATA_STATE,
+        ]:
             event |= constants.POLLIN
-        if len(self._data_to_send):
+        if self._state in [
+            DataSocket.SEND_CONNECT_STATE,
+            DataSocket.SEND_LOGIN_STATE,
+            DataSocket.SEND_SHAHAR_STATE
+        ]:
             event |= constants.POLLOUT
         return event
 
