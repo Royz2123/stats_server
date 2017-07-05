@@ -35,7 +35,7 @@ class AsyncServer(object):
         ## Key: file descriptor
         ## Value: Pollable object
         self._pollables = {}
-    
+
     ## Add a ListenerSocket to the pollables dict
     def add_listener(self):
         sock = socket.socket(
@@ -140,12 +140,12 @@ class AsyncServer(object):
 
     ## Function that gracefully closes and terminates the sockets that need
     ## terminating.
-    ## If a pollable doesn't want to close after on_close it must be a
     ## callable so add to the callables list.
     def close_needed(self):
         for fd, entry in self._pollables.items()[:]:
             if entry.is_terminating():
                 entry.on_close()
+                del self._pollables[fd]
 
     ## Forcefully close all sockets
     def close_all(self):

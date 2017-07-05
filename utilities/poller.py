@@ -71,8 +71,7 @@ class Select():
 
         # asynchronously recv which fd's need handling
         # As opposed to poll timeout, select timeout needs to be in seconds
-        print rlist, wlist, xlist
-        
+
         r, w, x = select.select(rlist, wlist, xlist, float(timeout)/1000)
 
         # arrange format to fit AsyncServer

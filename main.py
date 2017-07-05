@@ -58,7 +58,7 @@ def parse_args():
     parser.add_argument(
         '--poll-type',
         choices=POLL_TYPE.keys(),
-        default=sorted(POLL_TYPE.keys())[0],
+        default=sorted(POLL_TYPE.keys())[1],
         help='poll or select, default: poll'
     )
     parser.add_argument(
