@@ -23,7 +23,7 @@ POLL_EVENTS = {
 }
 
 ## Default frontend server http bind port
-DEFAULT_HTTP_PORT = 8000
+DEFAULT_HTTP_PORT = 80
 
 ## Default bind address (should always by "0.0.0.0")
 DEFAULT_HTTP_ADDRESS = "0.0.0.0"
