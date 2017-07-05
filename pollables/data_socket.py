@@ -9,6 +9,7 @@ import logging
 import os
 import select
 import socket
+import struct
 import time
 import traceback
 
@@ -41,6 +42,9 @@ class DataSocket(pollable.Pollable):
 
         ## Current state the socket is in
         self._state = DataSocket.DATA_STATE
+
+        ## Data need to send back to moshe
+        self._data_to_send = ""
 
         ## Pointer to all the pollables in the server
         self._recvd_data = ""
@@ -150,7 +154,20 @@ class DataSocket(pollable.Pollable):
         ])
 
     def info(self, parsed_data):
-        self._recvd_data = "Coming Soon..."
+        self._data_to_send = ""
+
+        for username, info in self._application_context["users"].items():
+            self._data_to_send += "%s:%s," % (
+                username,
+                info["timestamp"]
+            )
+        self._data_to_send = self._data_to_send[:-1]
+
+        self._data_to_send = (
+            struct.pack('>I', len(self._data_to_send))
+            + self._data_to_send
+        )
+
 
     DATA_REQUEST = {
         'fd' : fixed_data,
@@ -213,7 +230,7 @@ class DataSocket(pollable.Pollable):
         event = constants.POLLERR
         if self._state == DataSocket.DATA_STATE:
             event |= constants.POLLIN
-        elif len(self._recvd_data):
+        if len(self._data_to_send):
             event |= constants.POLLOUT
         return event
 

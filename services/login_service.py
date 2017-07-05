@@ -67,10 +67,15 @@ class LoginService(base_service.BaseService):
                 raise RuntimeError("Invalid Credentials")
 
             # document this login
-            entry.application_context["users"][req_name] = {
-                "timestamp" : time.time(),
-                "cookie" : util.generate_cookie(),
-            }
+            if req_name not in entry.application_context["users"].keys():
+                entry.application_context["users"][req_name] = {
+                    "timestamp" : time.time(),
+                    "cookie" : util.generate_cookie(),
+                }
+            else:
+                entry.application_context["users"][req_name]["timestamp"] = (
+                    time.time()
+                )
 
             self._response_content = html_util.create_html_page(
                 html_util.create_stats_page(greet),
